@@ -29,8 +29,10 @@ logErr("requesting speech recognition authorization...")
 var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
 var authDone = false
 SFSpeechRecognizer.requestAuthorization { status in
-    authStatus = status
-    authDone = true
+    DispatchQueue.main.async {
+        authStatus = status
+        authDone = true
+    }
 }
 waitUntil { authDone }
 
@@ -57,7 +59,7 @@ guard recognizer.supportsOnDeviceRecognition else {
 
 func isNoSpeechError(_ error: Error) -> Bool {
     let nsError = error as NSError
-    return nsError.code == 1110 || nsError.code == 203 || nsError.code == 216
+    return nsError.code == 1110
 }
 
 func runRecognition(request: SFSpeechRecognitionRequest, beforeWait: () -> Void = {}) -> String {
