@@ -169,10 +169,13 @@ tail -f ~/capture/state/image-ocr.log
 ```
 
 For verbose `audio-capture` state-transition logs, set `DWR_DEBUG=1` in the
-plist's `EnvironmentVariables` and reload the job:
+plist's `EnvironmentVariables` and reload the job. `launchctl kickstart -k`
+only restarts the service launchd already has in memory; to pick up plist
+edits the job has to be unloaded and re-bootstrapped from the file:
 
 ```bash
-launchctl kickstart -k gui/$(id -u)/dev.goofmint.dw.audio-capture
+launchctl bootout gui/$(id -u)/dev.goofmint.dw.audio-capture
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.goofmint.dw.audio-capture.plist
 ```
 
 ## Maintenance
