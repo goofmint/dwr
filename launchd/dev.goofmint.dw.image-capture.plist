@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template plist for dev.goofmint.dw.image-capture.
+  setup.sh substitutes __HOME__ and __REPO__ with absolute paths and copies
+  the result to ~/Library/LaunchAgents/.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>dev.goofmint.dw.image-capture</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/bin/image-capture.sh</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>5</integer>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/capture/state/image-capture.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/capture/state/image-capture.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- launchd's default PATH lacks Homebrew; ImageMagick (compare,
+             identify, mogrify) and screencapture's helpers all live there. -->
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>

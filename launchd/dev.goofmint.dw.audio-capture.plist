@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template plist for dev.goofmint.dw.audio-capture.
+  setup.sh substitutes __HOME__ and __REPO__ with absolute paths and copies
+  the result to ~/Library/LaunchAgents/.
+
+  audio-capture.sh runs an internal `while true` loop driving ffmpeg, so the
+  expected lifetime is "forever". KeepAlive=true tells launchd to respawn the
+  script if it ever crashes.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>dev.goofmint.dw.audio-capture</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/bin/audio-capture.sh</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/capture/state/audio-capture.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/capture/state/audio-capture.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- ffmpeg is a Homebrew install; default launchd PATH wouldn't find it. -->
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>
