@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template plist for dev.goofmint.dw.audio-transcribe.
+  setup.sh substitutes __HOME__ and __REPO__ with absolute paths and copies
+  the result to ~/Library/LaunchAgents/.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>dev.goofmint.dw.audio-transcribe</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/bin/audio-transcribe.sh</string>
+    </array>
+
+    <key>WatchPaths</key>
+    <array>
+        <string>__HOME__/capture/audio/incoming</string>
+    </array>
+
+    <key>ThrottleInterval</key>
+    <integer>1</integer>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/capture/state/audio-transcribe.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/capture/state/audio-transcribe.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>
