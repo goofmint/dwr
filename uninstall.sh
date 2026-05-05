@@ -41,7 +41,7 @@ done
 section "Removing $LOCAL_BIN symlinks"
 for name in dw-ocr-cli dw-transcribe-cli; do
     f="$LOCAL_BIN/$name"
-    if [ -L "$f" ] || [ -e "$f" ]; then
+    if [ -L "$f" ]; then
         rm -f "$f"
         info "removed $f"
     fi

@@ -93,6 +93,10 @@ done
 
 for label in "${LABELS[@]}"; do
     src="$REPO/launchd/${label}.plist"
+    if [ ! -e "$src" ]; then
+        err "missing launchd template: $src"
+        exit 1
+    fi
     dst="$LAUNCHD_DIR/${label}.plist"
     sed -e "s|__HOME__|$HOME|g" -e "s|__REPO__|$REPO|g" "$src" > "$dst"
     info "wrote $dst"
