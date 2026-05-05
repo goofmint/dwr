@@ -26,7 +26,7 @@ stderr) to terminate ffmpeg on 2 s of trailing silence.
 
 ## Requirements
 
-- macOS 13 (Ventura) or later — built and tested on macOS 26 (Tahoe)
+- macOS 13 (Ventura) or later — built and tested on macOS 15 (Sequoia)
 - [Homebrew](https://brew.sh)
 - Xcode Command Line Tools (`xcode-select --install`)
 - A microphone
