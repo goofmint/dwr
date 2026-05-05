@@ -1,0 +1,23 @@
+# Daily Work Capture System - configuration
+#
+# Copy this file to ~/.config/dwr/config.toml and edit, or run
+# `bin/configure.sh` for an interactive setup.
+# All keys are optional; unset keys fall back to script defaults.
+# Environment variables of the same uppercase name take priority.
+
+# Audio input device. Pass the exact CoreAudio name shown by
+# `bin/list-audio-devices.sh`. When unset, the system default input is used.
+# If the configured device disappears (e.g., USB mic unplugged when going out),
+# audio-capture.sh falls back to the current system default automatically and
+# switches back when the device returns.
+# audio_input_device = "Yeti Stereo Microphone"
+
+# Silence threshold (dB notation) for ffmpeg's silenceremove filter.
+# More negative = more sensitive. Typical: -40dB (room ambient),
+# -30dB (loud env), -50dB (quiet env).
+# silence_threshold = "-40dB"
+
+# Hard cap (seconds) on a single audio segment. Also bounds how long a
+# stale ffmpeg keeps running after a mid-recording USB unplug before the
+# next iteration gets to retry the device.
+# max_segment_sec = 60
