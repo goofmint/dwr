@@ -26,12 +26,19 @@ DWR_CONFIG="${DWR_CONFIG:-$HOME/.config/dwr/config.toml}"
 : "${AUDIO_INPUT_DEVICE:=$(toml_read "$DWR_CONFIG" audio_input_device)}"
 : "${SILENCE_THRESHOLD:=$(toml_read "$DWR_CONFIG" silence_threshold)}"
 : "${MAX_SEGMENT_SEC:=$(toml_read "$DWR_CONFIG" max_segment_sec)}"
+: "${MIN_PEAK_DB:=$(toml_read "$DWR_CONFIG" min_peak_db)}"
 
 SILENCE_THRESHOLD="${SILENCE_THRESHOLD:--40dB}"
 # 60s upper bound: caps any single recording, and bounds how long a stale
 # ffmpeg keeps running after a mid-recording USB unplug before the next
 # iteration gets to retry the device.
 MAX_SEGMENT_SEC="${MAX_SEGMENT_SEC:-60}"
+# Minimum peak level (dB) for a recording to be kept. silenceremove +
+# silencedetect can mis-classify ambient hum as "audio" when the configured
+# silence_threshold sits below the room noise floor; the resulting wav has
+# nothing actually intelligible. Reject anything whose loudest sample never
+# crosses this line. Real speech typically peaks at -25dB or higher.
+MIN_PEAK_DB="${MIN_PEAK_DB:--30}"
 
 mkdir -p "$INCOMING"
 
@@ -70,6 +77,19 @@ ffmpeg_stderr=""
 log_dbg() {
     [ "${DWR_DEBUG:-0}" = "1" ] || return 0
     printf '[%s] audio-capture: %s\n' "$(date +%H:%M:%S)" "$*" >&2
+}
+
+# Returns 0 if the wav's loudest sample is at or above MIN_PEAK_DB.
+# ffmpeg's volumedetect prints "max_volume: -X.Y dB" to stderr; -inf means
+# the whole file is digital silence.
+has_speech_signal() {
+    local file="$1" peak
+    peak="$(ffmpeg -hide_banner -nostats -i "$file" -af volumedetect -f null - 2>&1 \
+        | awk -F': ' '/max_volume:/ { gsub(/[[:space:]]/, "", $2); sub(/dB$/, "", $2); print $2 }')"
+    if [ -z "$peak" ] || [ "$peak" = "-inf" ]; then
+        return 1
+    fi
+    awk -v p="$peak" -v t="$MIN_PEAK_DB" 'BEGIN { exit !(p+0 >= t+0) }'
 }
 
 # True when the process exists AND isn't a zombie. `kill -0` returns success
@@ -244,7 +264,12 @@ while true; do
     record_to "$tmp" || true
 
     if [ -s "$tmp" ]; then
-        mv "$tmp" "$INCOMING/${ts}.wav"
+        if has_speech_signal "$tmp"; then
+            mv "$tmp" "$INCOMING/${ts}.wav"
+        else
+            log_dbg "wav peak below ${MIN_PEAK_DB}dB; discarding"
+            rm -f "$tmp"
+        fi
     else
         rm -f "$tmp"
     fi

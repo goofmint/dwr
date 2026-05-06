@@ -21,3 +21,9 @@
 # stale ffmpeg keeps running after a mid-recording USB unplug before the
 # next iteration gets to retry the device.
 # max_segment_sec = 60
+
+# Minimum peak level (dB) for a recording to be kept on disk. Catches the
+# case where the silence threshold sat below the room's noise floor and
+# ffmpeg captured nothing but ambient hum. Real speech typically peaks at
+# -25dB or higher.
+# min_peak_db = "-30"

@@ -36,14 +36,20 @@ for png in "$INCOMING"/*.png; do
     fi
 
     fname="$(basename "$png")"
-    today="$(date +%Y-%m-%d)"
-    now="$(date +%H:%M:%S)"
-    md="$TEXT_DIR/$today.md"
 
-    {
-        printf '\n## [%s] image %s\n\n' "$now" "$fname"
-        printf '%s\n' "$text"
-    } >> "$md"
+    # Skip the markdown entry if OCR yielded no text (e.g., a blank-screen
+    # capture or unrecognizable content). An empty heading-only block is just
+    # noise in the daily log.
+    if [ -n "$(printf '%s' "$text" | tr -d '[:space:]')" ]; then
+        today="$(date +%Y-%m-%d)"
+        now="$(date +%H:%M:%S)"
+        md="$TEXT_DIR/$today.md"
+
+        {
+            printf '\n## [%s] image %s\n\n' "$now" "$fname"
+            printf '%s\n' "$text"
+        } >> "$md"
+    fi
 
     mv "$proc" "$PROCESSED/$fname"
 done
