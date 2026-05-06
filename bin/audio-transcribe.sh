@@ -35,14 +35,20 @@ for wav in "$INCOMING"/*.wav; do
     fi
 
     fname="$(basename "$wav")"
-    today="$(date +%Y-%m-%d)"
-    now="$(date +%H:%M:%S)"
-    md="$TEXT_DIR/$today.md"
 
-    {
-        printf '\n## [%s] audio %s\n\n' "$now" "$fname"
-        printf '%s\n' "$text"
-    } >> "$md"
+    # Skip the markdown entry if transcribe-cli produced no recognizable text:
+    # otherwise we get a heading with an empty body, which is just noise to
+    # whoever reads the daily log later.
+    if [ -n "$(printf '%s' "$text" | tr -d '[:space:]')" ]; then
+        today="$(date +%Y-%m-%d)"
+        now="$(date +%H:%M:%S)"
+        md="$TEXT_DIR/$today.md"
+
+        {
+            printf '\n## [%s] audio %s\n\n' "$now" "$fname"
+            printf '%s\n' "$text"
+        } >> "$md"
+    fi
 
     mv "$proc" "$PROCESSED/$fname"
 done
